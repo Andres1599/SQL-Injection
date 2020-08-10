@@ -3,7 +3,6 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import indexRouter from './routes/index.js';
-import usersRouter from './routes/users.js';
 
 let app = express();
 const __dirname = path.resolve();
@@ -16,8 +15,7 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 app.set('view engine', 'jade');
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/', indexRouter);
 
 app.use((req, res, next) => {
   next(createError(404));

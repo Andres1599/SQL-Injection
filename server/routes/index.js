@@ -1,9 +1,8 @@
 import express from 'express';
+import { getUsers } from '../controllers/user.controller.js'
+
 let router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+router.get('/users', getUsers);
 
 export default router;
