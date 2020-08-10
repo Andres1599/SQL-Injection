@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-import app from '../app';
+import app from '../app.js';
 import debugLib from 'debug';
 import http from 'http';
 const debug = debugLib('sql-injection:server');
@@ -34,16 +34,16 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  let portOn = parseInt(val, 10);
 
-  if (isNaN(port)) {
+  if (isNaN(portOn)) {
     // named pipe
     return val;
   }
 
-  if (port >= 0) {
+  if (portOn >= 0) {
     // port number
-    return port;
+    return portOn;
   }
 
   return false;
