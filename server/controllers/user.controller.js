@@ -49,13 +49,13 @@ function createUser(req, res) {
     const userSend = req.body
 
     const statement = 'INSERT INTO users VALUES (0,' +
-        `${userSend.name}` + ',' + `${userSend.lastName}` + ',' + `${userSend.email}` + ',' + `${userSend.password}` + ')'
+        `${userSend.name}` + ',' + `${userSend.lastName}` + ',' + `${userSend.email}` + ',' +
+        `${userSend.password}` + ')'
 
     conn.promise().query(statement).then(
         (rows, fields) => {
             res.status(200).json({
-                user: rows[0],
-                query: statement
+                user: rows
             });
         }
     ).catch(err => {
@@ -75,8 +75,30 @@ function deleteUser(req, res) {
     conn.promise().query(statement).then(
         (rows, fields) => {
             res.status(200).json({
-                user: rows[0],
-                query: statement
+                deleted: rows
+            });
+        }
+    ).catch(err => {
+        res.status(404).json({
+            err,
+            message: 'Error',
+            query: statement
+        });
+    });
+}
+
+function updateUser(req, res) {
+    const userSend = req.body
+
+    const statement = 'UPDATE users SET name="' +
+        `${userSend.name}` + '", last_name="' + `${userSend.lastName}` + '", email="' +
+        `${userSend.email}` + '", password="' + `${userSend.password}` + '" WHERE id= ' +
+        `${userSend.id}` + ';'
+
+    conn.promise().query(statement).then(
+        (rows, fields) => {
+            res.status(200).json({
+                user: rows
             });
         }
     ).catch(err => {
@@ -92,5 +114,6 @@ export {
     getUsers,
     loginUser,
     createUser,
-    deleteUser
+    deleteUser,
+    updateUser
 }
