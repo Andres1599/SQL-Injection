@@ -9,6 +9,7 @@ export default class DataBase {
             host: 'localhost',
             user: 'root',
             database: 'sys_secure',
+            multipleStatements: true
         });
     }
 
