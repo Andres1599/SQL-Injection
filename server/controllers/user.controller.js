@@ -33,7 +33,6 @@ function loginUser(req, res) {
         (rows, fields) => {
             res.status(200).json({
                 user: rows[0],
-                query: statement
             });
         }
     ).catch(err => {
@@ -53,7 +52,7 @@ function createUser(req, res) {
         `${userSend.password}` + ')'
 
     conn.promise().query(statement).then(
-        (rows, fields) => {
+        (rows, ) => {
             res.status(200).json({
                 user: rows
             });
@@ -68,12 +67,12 @@ function createUser(req, res) {
 }
 
 function deleteUser(req, res) {
-    const userId = req.body
+    const userId = req.params
 
-    const statement = 'DELETE FROM users where id = ' + `${userId.id}` + ';'
+    const statement = 'DELETE FROM users where id = ' + `${userId}` + ';'
 
     conn.promise().query(statement).then(
-        (rows, fields) => {
+        (rows, ) => {
             res.status(200).json({
                 deleted: rows
             });
@@ -96,7 +95,7 @@ function updateUser(req, res) {
         `${userSend.id}` + ';'
 
     conn.promise().query(statement).then(
-        (rows, fields) => {
+        (rows, ) => {
             res.status(200).json({
                 user: rows
             });
