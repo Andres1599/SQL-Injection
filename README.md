@@ -31,5 +31,13 @@ To run this project, first install all dependencies run `npm install`. After ins
 ## Scripts
 
 ```bash
-pip install foobar
+    "start": "npm run prod",
+    "build": "npm-run-all clean transpile",
+    "server": "node ./server/bin/www.js",
+    "dev": "SET NODE_ENV=dev npm-run-all build server",
+    "prod": "SET NODE_ENV=prod npm-run-all build server",
+    "transpile": "babel ./server --out-dir dist",
+    "clean": "rimraf dist",
+    "watch:dev": "nodemon",
+    "test": "jest --coverage=true"
 ```
