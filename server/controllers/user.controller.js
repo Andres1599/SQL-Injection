@@ -1,20 +1,29 @@
-import Singleton from '../models/singleton.model.js'
+import Sequelize from 'sequelize';
+const sequelize = new Sequelize('sys_secure', 'root', '', {
+    dialect: 'mysql',
+    dialectOptions: {
+      host: 'localhost'
+    },
+    logging: console.log,
+    define: {
+        freezeTableName: true
+    }
+  });
 
-const conn = new Singleton().getInstance().conn();
+  let User = sequelize.define('users', {
+      name: Sequelize.STRING,
+      last_name: Sequelize.STRING,
+      email: Sequelize.STRING,
+      password: Sequelize.STRING
+  }, {
+    timestamps: false
+  });
 
 function getUsers(req, res) {
-    conn.promise().query('SELECT * FROM users').then((rows) => {
-        if (rows) {
-            res.status(200).json({
-                users: rows[0]
-            })
-        }
-    }).catch(err => {
-        res.status(404).json({
-            err,
-            message: 'Error'
-        });
-    })
+    User.findAll().then(users => {
+        console.log("All users:", JSON.stringify(users, null, 2));
+        res.status(200).json(users);
+    });
 }
 
 function loginUser(req, res) {
@@ -27,61 +36,54 @@ function loginUser(req, res) {
         });
     }
 
-    const statement = 'SELECT * FROM users WHERE email=\'' + `${userCredential.email}` + '\' and password=\'' + `${userCredential.password}` + '\'';
-
-    conn.promise().query(statement).then(
-        (rows, fields) => {
-            res.status(200).json({
-                user: rows[0],
+    User.findOne({ where: {email: userCredential.email, password: userCredential.password }}).then(user => {
+        if (!user) {
+            res.status(404).json({
+                err,
+                message: 'Invalid User'
             });
+        } else {
+            console.log("Logged user:", JSON.stringify(user, null, 2));
+            res.status(200).json(user);
         }
-    ).catch(err => {
+    }).catch(function (err) {
         res.status(404).json({
             err,
-            message: 'Error',
-            query: statement
+            message: 'Invalid User'
         });
     });
 }
 
 function createUser(req, res) {
-    const userSend = req.body
+    const userSend = req.body;
 
-    const statement = 'INSERT INTO users VALUES (0,' +
-        `${userSend.name}` + ',' + `${userSend.lastName}` + ',' + `${userSend.email}` + ',' +
-        `${userSend.password}` + ')'
-
-    conn.promise().query(statement).then(
-        (rows, ) => {
-            res.status(200).json({
-                user: rows
-            });
-        }
-    ).catch(err => {
+    User.build({ name: userSend.name, last_name: userSend.lastName, email: userSend.email, password: userSend.password}).then(() => {
+        console.log('User created');
+        res.status(200).json({});
+    }).catch(function (err) {
         res.status(404).json({
             err,
-            message: 'Error',
-            query: statement
+            message: 'Creating error'
         });
     });
 }
 
 function deleteUser(req, res) {
-    const userId = req.params
+    const userId = req.params.id
 
-    const statement = 'DELETE FROM users where id = ' + `${userId}` + ';'
-
-    conn.promise().query(statement).then(
-        (rows, ) => {
-            res.status(200).json({
-                deleted: rows
+    User.destroy({ where: { id: userId }}).then(user => {
+        if (!user) {
+            res.status(404).json({
+                err,
+                message: 'Invalid User'
             });
+        } else {
+            res.status(200).json(user);
         }
-    ).catch(err => {
+    }).catch(function (err) {
         res.status(404).json({
             err,
-            message: 'Error',
-            query: statement
+            message: 'Invalid User'
         });
     });
 }
@@ -89,24 +91,22 @@ function deleteUser(req, res) {
 function updateUser(req, res) {
     const userSend = req.body
 
-    const statement = 'UPDATE users SET name="' +
-        `${userSend.name}` + '", last_name="' + `${userSend.lastName}` + '", email="' +
-        `${userSend.email}` + '", password="' + `${userSend.password}` + '" WHERE id= ' +
-        `${userSend.id}` + ';'
-
-    conn.promise().query(statement).then(
-        (rows, ) => {
-            res.status(200).json({
-                user: rows
+        User.update({ name: userSend.name, last_name: userSend.lastName, email: userSend.email, password: userSend.password },
+        { where: { id: userSend.id }}).then(user => {
+            if (!user) {
+                res.status(404).json({
+                    err,
+                    message: 'Invalid User'
+                });
+            } else {
+                res.status(200).json(user);
+            }
+        }).catch(function (err) {
+            res.status(404).json({
+                err,
+                message: 'Invalid User'
             });
-        }
-    ).catch(err => {
-        res.status(404).json({
-            err,
-            message: 'Error',
-            query: statement
         });
-    });
 }
 
 export {
